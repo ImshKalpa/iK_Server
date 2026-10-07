@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>iK — Secure Access | iOS 27 Liquid Glass</title>
+
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, #3730a3, transparent 35%),
+    radial-gradient(circle at bottom right, #4f46e5, transparent 30%),
+    #09090f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+/* MAIN CARD */
+
+.container {
+  width: 400px;
+  max-width: 92%;
+  padding: 32px;
+
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+
+  border-radius: 25px;
+  backdrop-filter: blur(20px);
+
+  box-shadow: 0 25px 80px rgba(0,0,0,0.55);
+
+  animation: cardAppear .6s ease;
+}
+
+@keyframes cardAppear {
+  from {
+    opacity: 0;
+    transform: translateY(25px) scale(.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* LOGO */
+
+.logo {
+  text-align: center;
+
+  font-size: 60px;
+  font-weight: 900;
+
+  letter-spacing: -6px;
+
+  margin-bottom: 3px;
+
+  background: linear-gradient(135deg,#fff,#a5b4fc);
+
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.subtitle {
+  text-align: center;
+
+  color: #a7a7b5;
+
+  margin-bottom: 27px;
+
+  font-size: 14px;
+}
+
+/* TABS */
+
+.tabs {
+  display: flex;
+
+  background: rgba(0,0,0,.25);
+
+  padding: 5px;
+
+  border-radius: 13px;
+
+  margin-bottom: 25px;
+}
+
+.tabs button {
+  width: 50%;
+
+  border: none;
+
+  padding: 12px;
+
+  border-radius: 9px;
+
+  background: transparent;
+
+  color: #999;
+
+  cursor: pointer;
+
+  font-size: 15px;
+
+  transition: .25s;
+}
+
+.tabs button:hover {
+  color: white;
+}
+
+.tabs button.active {
+  background: white;
+
+  color: #111;
+
+  box-shadow: 0 5px 20px rgba(0,0,0,.2);
+}
+
+/* FORMS */
+
+.form {
+  display: none;
+}
+
+.form.show {
+  display: block;
+}
+
+/* PROVIDER BUTTONS */
+
+.provider {
+  width: 100%;
+
+  padding: 13px 16px;
+
+  margin: 7px 0;
+
+  border-radius: 12px;
+
+  border: 1px solid rgba(255,255,255,.14);
+
+  background: rgba(255,255,255,.07);
+
+  color: white;
+
+  cursor: pointer;
+
+  font-size: 15px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 12px;
+
+  transition: .25s;
+}
+
+.provider:hover {
+  background: rgba(255,255,255,.14);
+
+  transform: translateY(-2px);
+
+  box-shadow: 0 8px 25px rgba(0,0,0,.2);
+}
+
+.provider:active {
+  transform: scale(.98);
+}
+
+.provider-icon {
+  width: 23px;
+  height: 23px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+}
+
+.provider-icon svg {
+  width: 23px;
+  height: 23px;
+
+  display: block;
+}
+
+/* INPUTS */
+
+label {
+  display: block;
+
+  margin: 15px 0 7px;
+
+  color: #d5d5dc;
+
+  font-size: 13px;
+}
+
+input {
+  width: 100%;
+
+  padding: 14px;
+
+  border-radius: 11px;
+
+  border: 1px solid rgba(255,255,255,.14);
+
+  background: rgba(0,0,0,.28);
+
+  color: white;
+
+  outline: none;
+
+  font-size: 14px;
+
+  transition: .2s;
+}
+
+input::placeholder {
+  color: #777;
+}
+
+input:focus {
+  border-color: #818cf8;
+
+  box-shadow:
+    0 0 0 3px rgba(99,102,241,.15);
+}
+
+/* LOGIN BUTTON */
+
+.loginBtn {
+  width: 100%;
+
+  margin-top: 20px;
+
+  padding: 14px;
+
+  border: none;
+
+  border-radius: 12px;
+
+  background:
+    linear-gradient(135deg,#6366f1,#4f46e5);
+
+  color: white;
+
+  font-size: 16px;
+
+  font-weight: bold;
+
+  cursor: pointer;
+
+  transition: .25s;
+}
+
+.loginBtn:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 10px 30px rgba(79,70,229,.35);
+}
+
+/* NOTICE */
+
+.demo {
+  text-align: center;
+
+  margin-top: 20px;
+
+  color: #777;
+
+  font-size: 11px;
+
+  line-height: 1.5;
+}
+
+
+/* =========================================
+   FAKE HACK SCREEN
+========================================= */
+
+#hackScreen {
+  display: none;
+
+  position: fixed;
+
+  inset: 0;
+
+  background: #000;
+
+  z-index: 9999;
+
+  overflow: hidden;
+}
+
+/* MATRIX CANVAS */
+
+#matrixCanvas {
+  position: absolute;
+
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  opacity: .75;
+}
+
+.matrixOverlay {
+  position: absolute;
+
+  inset: 0;
+
+  background:
+    radial-gradient(
+      circle,
+      transparent 0%,
+      rgba(0,0,0,.45) 65%,
+      rgba(0,0,0,.9) 100%
+    );
+}
+
+/* SCANLINES */
+
+.scanlines {
+  position: absolute;
+
+  inset: 0;
+
+  pointer-events: none;
+
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255,255,255,.025) 0px,
+      rgba(255,255,255,.025) 1px,
+      transparent 2px,
+      transparent 5px
+    );
+
+  opacity: .35;
+}
+
+/* TERMINAL */
+
+.terminal {
+  position: absolute;
+
+  left: 50%;
+  top: 50%;
+
+  transform: translate(-50%,-50%);
+
+  width: 850px;
+
+  max-width: 92%;
+
+  max-height: 80vh;
+
+  padding: 25px;
+
+  background: rgba(0,0,0,.78);
+
+  border:
+    1px solid rgba(0,255,90,.35);
+
+  border-radius: 14px;
+
+  box-shadow:
+    0 0 50px rgba(0,255,80,.12);
+
+  overflow: hidden;
+}
+
+.terminalHeader {
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  padding-bottom: 15px;
+
+  border-bottom:
+    1px solid rgba(0,255,90,.18);
+
+  margin-bottom: 15px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+
+  border-radius: 50%;
+
+  background: #20ff70;
+
+  box-shadow:
+    0 0 10px #20ff70;
+}
+
+.terminalTitle {
+  margin-left: 8px;
+
+  color: #20ff70;
+
+  font-size: 12px;
+
+  letter-spacing: 2px;
+}
+
+#terminalText {
+  height: 330px;
+
+  overflow: hidden;
+
+  color: #20ff70;
+
+  font-family: "Courier New", monospace;
+
+  font-size: 13px;
+
+  line-height: 1.55;
+
+  text-shadow:
+    0 0 7px rgba(0,255,90,.7);
+}
+
+.terminalLine {
+  white-space: nowrap;
+}
+
+
+/* =========================================
+   FAKE ALERT
+========================================= */
+
+.fakeAlert {
+  display: none;
+
+  position: absolute;
+
+  left: 50%;
+  top: 50%;
+
+  transform: translate(-50%,-50%);
+
+  width: 600px;
+
+  max-width: 90%;
+
+  padding: 35px 25px;
+
+  text-align: center;
+
+  background: rgba(0,0,0,.94);
+
+  border: 2px solid #ff2222;
+
+  border-radius: 15px;
+
+  box-shadow:
+    0 0 70px rgba(255,0,0,.35);
+
+  animation:
+    alertAppear .4s ease;
+}
+
+@keyframes alertAppear {
+  from {
+    opacity: 0;
+
+    transform:
+      translate(-50%,-50%)
+      scale(.85);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translate(-50%,-50%)
+      scale(1);
+  }
+}
+
+.alertIcon {
+  font-size: 70px;
+
+  margin-bottom: 10px;
+
+  animation:
+    alertPulse .55s infinite alternate;
+}
+
+@keyframes alertPulse {
+  from {
+    transform: scale(1);
+  }
+
+  to {
+    transform: scale(1.12);
+  }
+}
+
+.alertTitle {
+  color: #ff2222;
+
+  font-size: 35px;
+
+  font-weight: 900;
+
+  letter-spacing: 2px;
+
+  text-shadow:
+    0 0 15px rgba(255,0,0,.8);
+}
+
+.alertSub {
+  margin-top: 12px;
+
+  color: #ddd;
+
+  font-family:
+    "Courier New", monospace;
+
+  font-size: 14px;
+}
+
+/* PRANK REVEAL */
+
+.prankReveal {
+  display: none;
+
+  margin-top: 20px;
+
+  color: #20ff70;
+
+  font-size: 14px;
+
+  line-height: 1.7;
+}
+
+.returnBtn {
+  margin-top: 20px;
+
+  padding: 11px 24px;
+
+  border: none;
+
+  border-radius: 9px;
+
+  background: white;
+
+  color: black;
+
+  font-weight: bold;
+
+  cursor: pointer;
+}
+
+.returnBtn:hover {
+  transform: scale(1.04);
+}
+
+/* =========================================================
+   iK SECURE ACCESS — iOS 27 LIQUID GLASS
+   ========================================================= */
+:root{
+  --bg:#edf3fb;--bg2:#dce7f5;--text:#10131a;--muted:#687386;
+  --glass:rgba(255,255,255,.34);--glass-strong:rgba(255,255,255,.52);
+  --line:rgba(255,255,255,.76);--accent:#007aff;--accent2:#af52de;
+  --shadow:0 30px 90px rgba(35,55,90,.18),inset 0 1px 0 rgba(255,255,255,.85);
+}
+html[data-theme="dark"]{
+  --bg:#06080d;--bg2:#111625;--text:#f5f7fb;--muted:#a8b0c0;
+  --glass:rgba(24,29,41,.44);--glass-strong:rgba(36,42,57,.64);
+  --line:rgba(255,255,255,.16);--shadow:0 35px 100px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.13);
+}
+html{background:var(--bg);color-scheme:light;transition:background .7s ease}
+html[data-theme="dark"]{color-scheme:dark}
+
+body{
+  min-height:100vh!important;
+  background:
+    radial-gradient(700px 550px at 5% 5%,rgba(0,122,255,.24),transparent 68%),
+    radial-gradient(700px 550px at 95% 15%,rgba(175,82,222,.20),transparent 68%),
+    radial-gradient(650px 500px at 50% 105%,rgba(255,55,95,.13),transparent 72%),
+    linear-gradient(135deg,var(--bg),var(--bg2))!important;
+  color:var(--text)!important;
+  transition:background .7s ease,color .7s ease;
+  overflow-x:hidden;
+}
+body:before,body:after{
+  content:"";position:fixed;z-index:-1;pointer-events:none;
+  width:42vw;height:42vw;border-radius:50%;filter:blur(75px);opacity:.34;
+  animation:liquidFloat 15s ease-in-out infinite alternate;
+}
+body:before{left:-16vw;top:8vh;background:#007aff}
+body:after{right:-16vw;bottom:-10vh;background:#af52de;animation-delay:-7s}
+@keyframes liquidFloat{to{transform:translate(5%,8%) scale(1.12)}}
+
+/* Main glass card */
+.container{
+  position:relative!important;
+  background:linear-gradient(135deg,rgba(255,255,255,.48),rgba(255,255,255,.13))!important;
+  border:1px solid var(--line)!important;
+  border-radius:36px!important;
+  box-shadow:var(--shadow)!important;
+  -webkit-backdrop-filter:blur(36px) saturate(185%);
+  backdrop-filter:blur(36px) saturate(185%);
+  overflow:hidden;
+}
+.container:before{
+  content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;
+  background:
+   linear-gradient(125deg,rgba(255,255,255,.38),transparent 30%,transparent 70%,rgba(255,255,255,.09));
+}
+.container:after{
+  content:"";position:absolute;top:-100%;left:-35%;width:35%;height:280%;
+  pointer-events:none;background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent);
+  transform:rotate(18deg);animation:glassSheen 9s ease-in-out infinite;
+}
+@keyframes glassSheen{
+  0%,55%{transform:translateX(-150%) rotate(18deg);opacity:0}
+  65%{opacity:.5}
+  88%,100%{transform:translateX(480%) rotate(18deg);opacity:0}
+}
+
+.logo,.subtitle,.tabs,.form,.demo{position:relative;z-index:2}
+.logo{
+  background:linear-gradient(135deg,var(--text),var(--accent),var(--accent2))!important;
+  -webkit-background-clip:text!important;
+  -webkit-text-fill-color:transparent!important;
+}
+.subtitle{color:var(--muted)!important}
+
+/* Segmented control */
+.tabs{
+  background:rgba(127,140,160,.13)!important;
+  border:1px solid var(--line)!important;
+  border-radius:18px!important;
+  padding:5px!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.35);
+}
+.tabs button{
+  color:var(--muted)!important;border-radius:14px!important;
+  background:transparent!important;transition:.4s cubic-bezier(.22,1,.36,1)!important;
+}
+.tabs button:hover{color:var(--text)!important}
+.tabs button.active{
+  background:var(--glass-strong)!important;
+  color:var(--text)!important;
+  border:1px solid var(--line)!important;
+  box-shadow:0 8px 25px rgba(0,0,0,.10),inset 0 1px 0 rgba(255,255,255,.65)!important;
+  -webkit-backdrop-filter:blur(20px);
+  backdrop-filter:blur(20px);
+}
+
+/* Provider buttons */
+.provider{
+  background:rgba(255,255,255,.15)!important;
+  color:var(--text)!important;
+  border:1px solid var(--line)!important;
+  border-radius:18px!important;
+  box-shadow:0 10px 30px rgba(0,0,0,.07),inset 0 1px 0 rgba(255,255,255,.5)!important;
+  -webkit-backdrop-filter:blur(22px) saturate(160%);
+  backdrop-filter:blur(22px) saturate(160%);
+}
+.provider:hover{
+  background:rgba(255,255,255,.28)!important;
+  transform:translateY(-3px)!important;
+  box-shadow:0 18px 40px rgba(0,0,0,.13),inset 0 1px 0 rgba(255,255,255,.65)!important;
+}
+
+/* Inputs */
+label{color:var(--muted)!important}
+input{
+  background:rgba(255,255,255,.13)!important;
+  color:var(--text)!important;
+  border:1px solid var(--line)!important;
+  border-radius:17px!important;
+  -webkit-backdrop-filter:blur(20px);
+  backdrop-filter:blur(20px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.4)!important;
+}
+input::placeholder{color:var(--muted)!important;opacity:.7}
+input:focus{
+  border-color:rgba(0,122,255,.65)!important;
+  box-shadow:0 0 0 4px rgba(0,122,255,.12),inset 0 1px 0 rgba(255,255,255,.65)!important;
+}
+
+/* Login button */
+.loginBtn{
+  background:linear-gradient(135deg,#007aff,#5856d6,#af52de)!important;
+  border:1px solid rgba(255,255,255,.35)!important;
+  border-radius:18px!important;
+  box-shadow:0 16px 40px rgba(0,122,255,.25),inset 0 1px 0 rgba(255,255,255,.5)!important;
+}
+.loginBtn:hover{transform:translateY(-3px)!important}
+
+.demo{color:var(--muted)!important}
+
+/* Theme button */
+.liquid-theme{
+  position:fixed;top:22px;right:22px;z-index:10000;
+  display:flex;align-items:center;gap:8px;
+  min-width:108px;height:46px;padding:0 15px;
+  border-radius:999px;border:1px solid var(--line);
+  background:var(--glass-strong);color:var(--text);
+  box-shadow:0 18px 50px rgba(0,0,0,.16),inset 0 1px 0 rgba(255,255,255,.7);
+  -webkit-backdrop-filter:blur(30px) saturate(180%);
+  backdrop-filter:blur(30px) saturate(180%);
+  cursor:pointer;font-weight:700;transition:.45s ease;
+}
+.liquid-theme:hover{transform:translateY(-3px) scale(1.03)}
+.liquid-theme span:last-child{font-size:13px}
+
+/* Keep the hacker/prank screen intact, but glassify terminal */
+#hackScreen{background:#000!important}
+.terminal{
+  -webkit-backdrop-filter:blur(14px);
+  backdrop-filter:blur(14px);
+}
+
+/* Mobile */
+@media(max-width:600px){
+  .container{border-radius:28px!important}
+  .liquid-theme{
+    top:12px;right:12px;min-width:46px;width:46px;height:46px;padding:0;justify-content:center;
+  }
+  .liquid-theme span:last-child{display:none}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+
+</style>
+</head>
+
+
+<body>
+
+<button class="liquid-theme" id="liquidTheme" type="button" aria-label="Toggle dark and light theme">
+  <span id="liquidThemeIcon">☀️</span><span id="liquidThemeLabel">Light</span>
+</button>
+
+
+<!-- =========================================
+     MAIN LOGIN CARD
+========================================= -->
+
+<div class="container">
+
+  <div class="logo">
+    iK
+  </div>
+
+  <div class="subtitle">
+    Secure Access
+  </div>
+
+
+  <!-- TABS -->
+
+  <div class="tabs">
+
+    <button
+      class="active"
+      onclick="showTab('signin', this)">
+      Sign In
+    </button>
+
+    <button
+      onclick="showTab('login', this)">
+      Log In
+    </button>
+
+  </div>
+
+
+  <!-- SIGN IN -->
+
+  <div id="signin" class="form show">
+
+
+    <!-- GOOGLE -->
+
+    <button
+      class="provider"
+      onclick="chooseProvider('Google')">
+
+      <span class="provider-icon">
+
+        <svg viewBox="0 0 24 24">
+
+          <path
+            fill="#4285F4"
+            d="M21.35 12.27c0-.79-.07-1.55-.22-2.27H12v4.3h5.24a4.48 4.48 0 0 1-1.94 2.94v2.45h3.14c1.84-1.69 2.91-4.18 2.91-7.42z"/>
+
+          <path
+            fill="#34A853"
+            d="M12 21.5c2.63 0 4.84-.87 6.45-2.36l-3.14-2.45c-.87.58-1.98.92-3.31.92-2.54 0-4.69-1.72-5.46-4.03H3.3v2.53A9.75 9.75 0 0 0 12 21.5z"/>
+
+          <path
+            fill="#FBBC05"
+            d="M6.54 13.58A5.86 5.86 0 0 1 6.23 12c0-.55.11-1.08.31-1.58V7.89H3.3A9.75 9.75 0 0 0 2.25 12c0 1.57.38 3.06 1.05 4.42l3.24-2.84z"/>
+
+          <path
+            fill="#EA4335"
+            d="M12 6.39c1.43 0 2.71.49 3.72 1.45l2.79-2.79C16.83 3.45 14.62 2.5 12 2.5a9.75 9.75 0 0 0-8.7 5.39l3.24 2.53C7.31 8.11 9.46 6.39 12 6.39z"/>
+
+        </svg>
+
+      </span>
+
+      Continue with Google
+
+    </button>
+
+
+    <!-- FACEBOOK -->
+
+    <button
+      class="provider"
+      onclick="chooseProvider('Facebook')">
+
+      <span class="provider-icon">
+
+        <svg viewBox="0 0 24 24">
+
+          <path
+            fill="#1877F2"
+            d="M24 12a12 12 0 1 0-13.88 11.86v-8.39H7.08V12h3.04V9.36c0-3 1.79-4.66 4.53-4.66 1.31 0 2.68.23 2.68.23v2.95h-1.51c-1.49 0-1.96.93-1.96 1.88V12h3.34l-.53 3.47h-2.81v8.39A12 12 0 0 0 24 12z"/>
+
+        </svg>
+
+      </span>
+
+      Continue with Facebook
+
+    </button>
+
+
+    <!-- ICLOUD -->
+
+    <button
+      class="provider"
+      onclick="chooseProvider('iCloud')">
+
+      <span class="provider-icon">
+
+        <svg
+          viewBox="0 0 24 24"
+          fill="none">
+
+          <path
+            fill="#ffffff"
+            d="M18.5 18.5H7.2a4.7 4.7 0 1 1 .9-9.31A6.1 6.1 0 0 1 19.67 11a3.8 3.8 0 0 1-1.17 7.5Z"/>
+
+        </svg>
+
+      </span>
+
+      Continue with iCloud
+
+    </button>
+
+  </div>
+
+
+  <!-- LOGIN FORM -->
+
+  <div id="login" class="form">
+
+    <label>
+      Email
+    </label>
+
+    <input
+      id="email"
+      type="email"
+      placeholder="Enter email"
+      autocomplete="off"
+    >
+
+
+    <label>
+      Password
+    </label>
+
+    <input
+      id="password"
+      type="password"
+      placeholder="Enter password"
+      autocomplete="off"
+    >
+
+
+    <button
+      class="loginBtn"
+      onclick="fakeLogin()">
+
+      Log In
+
+    </button>
+
+  </div>
+
+
+  <div class="demo">
+
+    DEMO / PRANK MODE
+    <br>
+
+    No credentials are stored or transmitted.
+
+  </div>
+
+</div>
+
+
+<!-- =========================================
+     FAKE HACK SCREEN
+========================================= -->
+
+<div id="hackScreen">
+
+  <canvas id="matrixCanvas"></canvas>
+
+  <div class="matrixOverlay"></div>
+
+  <div class="scanlines"></div>
+
+
+  <!-- TERMINAL -->
+
+  <div
+    class="terminal"
+    id="terminal">
+
+    <div class="terminalHeader">
+
+      <span class="dot"></span>
+
+      <span class="dot"></span>
+
+      <span class="dot"></span>
+
+      <span class="terminalTitle">
+        SYSTEM SECURITY TERMINAL
+      </span>
+
+    </div>
+
+
+    <div id="terminalText"></div>
+
+  </div>
+
+
+  <!-- FAKE WARNING -->
+
+  <div
+    class="fakeAlert"
+    id="fakeAlert">
+
+    <div class="alertIcon">
+      ⚠️
+    </div>
+
+
+    <div class="alertTitle">
+
+      YOUR DEVICE HAS BEEN HACKED
+
+    </div>
+
+
+    <div class="alertSub">
+
+      Unauthorized access detected...
+
+      <br>
+
+      System security compromised.
+
+    </div>
+
+
+    <!-- PRANK REVEAL -->
+
+    <div
+      class="prankReveal"
+      id="prankReveal">
+
+      😄 DON'T PANIC!
+
+      <br><br>
+
+      This was only a fake prank animation.
+
+      <br>
+
+      Your device and account were NOT accessed.
+
+
+      <br>
+
+
+      <button
+        class="returnBtn"
+        onclick="location.reload()">
+
+        Return to iK
+
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<script>
+
+/* =========================================
+   TAB SWITCH
+========================================= */
+
+function showTab(tab, button) {
+
+  document
+    .querySelectorAll(".form")
+    .forEach(function(form) {
+
+      form.classList.remove("show");
+
+    });
+
+
+  document
+    .getElementById(tab)
+    .classList.add("show");
+
+
+  document
+    .querySelectorAll(".tabs button")
+    .forEach(function(btn) {
+
+      btn.classList.remove("active");
+
+    });
+
+
+  button.classList.add("active");
+}
+
+
+/* =========================================
+   PROVIDER
+========================================= */
+
+let selectedProvider = "";
+
+
+function chooseProvider(provider) {
+
+  selectedProvider = provider;
+
+
+  document
+    .getElementById("signin")
+    .classList.remove("show");
+
+
+  document
+    .getElementById("login")
+    .classList.add("show");
+
+
+  document
+    .querySelectorAll(".tabs button")
+    .forEach(function(btn) {
+
+      btn.classList.remove("active");
+
+    });
+
+
+  document
+    .querySelector(
+      ".tabs button:nth-child(2)"
+    )
+    .classList.add("active");
+
+}
+
+
+/* =========================================
+   FAKE LOGIN
+========================================= */
+
+function fakeLogin() {
+
+  const email =
+    document.getElementById("email").value;
+
+  const password =
+    document.getElementById("password").value;
+
+
+  if (!email || !password) {
+
+    alert("Please enter information.");
+
+    return;
+
+  }
+
+
+  /*
+    DEMO ONLY
+
+    Nothing is sent to a server.
+    Nothing is saved.
+  */
+
+
+  document
+    .getElementById("hackScreen")
+    .style.display = "block";
+
+
+  startMatrix();
+
+  startTerminal();
+
+}
+
+
+/* =========================================
+   MATRIX EFFECT
+========================================= */
+
+function startMatrix() {
+
+  const canvas =
+    document.getElementById(
+      "matrixCanvas"
+    );
+
+  const ctx =
+    canvas.getContext("2d");
+
+
+  canvas.width =
+    window.innerWidth;
+
+  canvas.height =
+    window.innerHeight;
+
+
+  const characters =
+    "01アイウエオカキクケコサシスセソABCDEFGHIJKLMNOPQRSTUVWXYZ#$%&@";
+
+
+  const fontSize = 15;
+
+
+  const columns =
+    Math.floor(
+      canvas.width / fontSize
+    );
+
+
+  const drops =
+    new Array(columns).fill(1);
+
+
+  function drawMatrix() {
+
+    ctx.fillStyle =
+      "rgba(0,0,0,0.08)";
+
+
+    ctx.fillRect(
+      0,
+      0,
+      canvas.width,
+      canvas.height
+    );
+
+
+    ctx.fillStyle =
+      "#20ff70";
+
+
+    ctx.font =
+      fontSize + "px monospace";
+
+
+    for (
+      let i = 0;
+      i < drops.length;
+      i++
+    ) {
+
+      const char =
+        characters[
+          Math.floor(
+            Math.random() *
+            characters.length
+          )
+        ];
+
+
+      ctx.fillText(
+        char,
+        i * fontSize,
+        drops[i] * fontSize
+      );
+
+
+      if (
+        drops[i] * fontSize >
+        canvas.height &&
+        Math.random() > .975
+      ) {
+
+        drops[i] = 0;
+
+      }
+
+
+      drops[i]++;
+
+    }
+
+  }
+
+
+  setInterval(
+    drawMatrix,
+    45
+  );
+
+}
+
+
+/* =========================================
+   TERMINAL ANIMATION
+========================================= */
+
+function startTerminal() {
+
+  const terminal =
+    document.getElementById(
+      "terminalText"
+    );
+
+
+  const messages = [
+
+    "Initializing security protocol...",
+    "Scanning system processes...",
+    "Checking active connections...",
+    "Analyzing network activity...",
+    "Access verification started...",
+    "Checking system permissions...",
+    "Analyzing device services...",
+    "Scanning security modules...",
+    "WARNING: Unusual activity detected",
+    "Attempting security lockdown...",
+    "Analyzing system files...",
+    "Checking active sessions...",
+    "Security response initiated...",
+    "System scan in progress...",
+    "WARNING: Security status changed",
+    "Finalizing security analysis..."
+
+  ];
+
+
+  let index = 0;
+
+
+  const interval =
+    setInterval(function() {
+
+
+      const line =
+        document.createElement(
+          "div"
+        );
+
+
+      line.className =
+        "terminalLine";
+
+
+      const randomHex =
+        Math.random()
+        .toString(16)
+        .substring(2,10)
+        .toUpperCase();
+
+
+      line.innerText =
+        "[SYSTEM] " +
+        messages[index] +
+        " 0x" +
+        randomHex;
+
+
+      terminal.appendChild(
+        line
+      );
+
+
+      if (
+        terminal.children.length > 17
+      ) {
+
+        terminal.removeChild(
+          terminal.firstChild
+        );
+
+      }
+
+
+      index++;
+
+
+      if (
+        index >= messages.length
+      ) {
+
+        index = 0;
+
+      }
+
+    }, 170);
+
+
+  setTimeout(function() {
+
+    clearInterval(interval);
+
+    showFakeAlert();
+
+  }, 5200);
+
+}
+
+
+/* =========================================
+   FINAL FAKE ALERT
+========================================= */
+
+function showFakeAlert() {
+
+  document
+    .getElementById("terminal")
+    .style.display = "none";
+
+
+  const alert =
+    document.getElementById(
+      "fakeAlert"
+    );
+
+
+  alert.style.display =
+    "block";
+
+
+  setTimeout(function() {
+
+    document
+      .getElementById(
+        "prankReveal"
+      )
+      .style.display = "block";
+
+  }, 2800);
+
+}
+
+
+/* =========================================
+   WINDOW RESIZE
+========================================= */
+
+window.addEventListener(
+  "resize",
+  function() {
+
+    const canvas =
+      document.getElementById(
+        "matrixCanvas"
+      );
+
+
+    if (canvas) {
+
+      canvas.width =
+        window.innerWidth;
+
+      canvas.height =
+        window.innerHeight;
+
+    }
+
+  }
+);
+
+</script>
+
+
+<script>
+(() => {
+  const root=document.documentElement;
+  const btn=document.getElementById('liquidTheme');
+  const icon=document.getElementById('liquidThemeIcon');
+  const label=document.getElementById('liquidThemeLabel');
+  let theme=localStorage.getItem('ik-secure-theme') ||
+    (matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+
+  function applyTheme(t,save=true){
+    theme=t;
+    root.dataset.theme=t;
+    if(save) localStorage.setItem('ik-secure-theme',t);
+    icon.textContent=t==='dark'?'🌙':'☀️';
+    label.textContent=t==='dark'?'Dark':'Light';
+  }
+  applyTheme(theme,false);
+  btn.addEventListener('click',()=>applyTheme(theme==='dark'?'light':'dark'));
+})();
+</script>
+
+</body>
+</html>
